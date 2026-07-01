@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initScrollTop();
   initMobileNav();
   initMagneticButtons(prefersReducedMotion);
+  initContactEmailLinks();
 
   // Bind custom glass nav clicks globally (with fallback smooth scrolling)
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -113,53 +114,59 @@ function initActiveNavHighlight() {
 /* ==========================================
    4. Email Click-to-Copy Clipboard
    ========================================== */
+function copyTextToClipboard(text, onSuccess, onFailure) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(onSuccess)
+      .catch((err) => {
+        console.warn("[LokiDev IDE] Clipboard API failed, trying fallback...", err);
+        fallback(text);
+      });
+  } else {
+    fallback(text);
+  }
+
+  function fallback(val) {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = val;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      if (successful) {
+        onSuccess();
+      } else {
+        if (onFailure) onFailure();
+      }
+    } catch (err) {
+      console.error("[LokiDev IDE] Fallback copy error:", err);
+      if (onFailure) onFailure();
+    }
+  }
+}
+
 function initEmailCopyBtn() {
   const emailBtn = document.getElementById("email-copy-btn");
   if (!emailBtn) return;
 
   emailBtn.addEventListener("click", () => {
     const email = emailBtn.getAttribute("data-email") || "lokile8499@gmail.com";
-    
-    // Attempt Clipboard API copy
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(email)
-        .then(() => {
-          const textSpan = emailBtn.querySelector(".btn-text");
-          if (textSpan) {
-            const originalText = textSpan.textContent;
-            textSpan.textContent = "Copied Address! ✅";
-            setTimeout(() => {
-              textSpan.textContent = originalText;
-            }, 2500);
-          }
-          showToast("Email copied to clipboard!");
-        })
-        .catch((err) => {
-          console.error("Clipboard copy error:", err);
-          showToast("Unable to copy email. Please copy it manually.");
-        });
-    } else {
-      // Fallback copy method
-      try {
-        const textarea = document.createElement("textarea");
-        textarea.value = email;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.select();
-        const successful = document.execCommand("copy");
-        document.body.removeChild(textarea);
-        
-        if (successful) {
-          showToast("Email copied to clipboard!");
-        } else {
-          showToast("Unable to copy email. Please copy it manually.");
-        }
-      } catch (err) {
-        console.error("Fallback copy error:", err);
-        showToast("Unable to copy email. Please copy it manually.");
+    copyTextToClipboard(email, () => {
+      const textSpan = emailBtn.querySelector(".btn-text");
+      if (textSpan) {
+        const originalText = textSpan.textContent;
+        textSpan.textContent = "Copied Address! ✅";
+        setTimeout(() => {
+          textSpan.textContent = originalText;
+        }, 2500);
       }
-    }
+      showToast("Email copied to clipboard!");
+    }, () => {
+      showToast("Unable to copy email. Please copy it manually.");
+    });
   });
 }
 
@@ -464,30 +471,31 @@ function initNetwork(reducedMotion) {
   const ctx = canvas.getContext("2d");
   const isMobile = window.matchMedia("(max-width: 768px)").matches || ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
-  // Node density settings
-  const nodeCount = isMobile ? 22 : 48;
-  const connectionDistance = 120;
+  // Optimized node counts (26 on mobile, 72 on desktop) to maintain high-density premium constellation
+  const nodeCount = isMobile ? 26 : 72;
+  const connectionDistance = 140;
+  const connectionDistanceSq = connectionDistance * connectionDistance;
   const nodes = [];
+  const pulses = []; // Data packets traveling along connecting lines
 
   let width = 0;
   let height = 0;
   let animationFrameId = null;
 
   // Mouse state variables
-  let mouse = { x: null, y: null, radius: 140 };
+  let mouse = { x: null, y: null, radius: 150 };
+  const mouseRadiusSq = mouse.radius * mouse.radius;
 
   // Shockwave state variables
   let isMouseDown = false;
   let pulseCenter = { x: 0, y: 0 };
   let pulseRadius = 0;
-  const maxPulseRadius = 800; // Cap to prevent infinite canvas sweep
+  const maxPulseRadius = 800;
 
   // Set dimensions
   function resizeCanvas() {
-    if (!canvas.parentElement) return;
-    const parentRect = canvas.parentElement.getBoundingClientRect();
-    width = parentRect.width;
-    height = parentRect.height;
+    width = window.innerWidth;
+    height = window.innerHeight;
 
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
@@ -499,104 +507,195 @@ function initNetwork(reducedMotion) {
 
   class Node {
     constructor() {
-      this.x = Math.random() * width;
-      this.y = Math.random() * height;
-      // Very slow random drift velocity
-      this.vx = (Math.random() - 0.5) * 0.08;
-      this.vy = (Math.random() - 0.5) * 0.08;
-      this.radius = Math.random() * 1.5 + 0.8; // Small grid dots
-      this.baseAlpha = Math.random() * 0.35 + 0.35;
+      // Depth parameter (0.5 = background, 2.5 = foreground)
+      this.z = Math.random() * 2 + 0.5;
+      
+      // Calculate target distribution: bias 60% of particles near the hero text area (left side, middle-vertical)
+      const biasToHero = Math.random() < 0.6;
+      if (biasToHero) {
+        this.homeX = Math.random() * width * 0.45; // Left-aligned
+        this.homeY = height * 0.25 + Math.random() * height * 0.5; // Centered vertically
+      } else {
+        this.homeX = Math.random() * width;
+        this.homeY = Math.random() * height;
+      }
+      
+      this.x = this.homeX;
+      this.y = this.homeY;
+
+      // Parallax-scaled drift velocities
+      const baseVel = 0.05 * (this.z / 2.5);
+      this.vx = (Math.random() - 0.5) * baseVel;
+      this.vy = (Math.random() - 0.5) * baseVel;
+
+      // Organic drift breathing parameters
+      this.phase = Math.random() * Math.PI * 2;
+      this.breathingSpeed = 0.0005 + Math.random() * 0.001;
+
+      // Depth-scaled properties (background nodes are drawn smaller and fainter to simulate blur organically)
+      this.radius = (this.z / 2.5) * 1.6 + 0.5; 
+      this.baseAlpha = (this.z / 2.5) * 0.4 + 0.15;
       this.alpha = this.baseAlpha;
-      this.activated = 0; // Shockwave propagation factor
+      this.activated = 0;
+
+      // Luxury tech color mix: Warm amber (70%), Gold (20%), Silver/White (10%)
+      const colorRand = Math.random();
+      if (colorRand < 0.1) {
+        this.colorType = "primary"; // Silver/White in Dark, Slate in Light
+      } else if (colorRand < 0.3) {
+        this.colorType = "secondary"; // Gold in Dark, Sky Blue in Light
+      } else {
+        this.colorType = "accent"; // Amber in Dark, Warm Amber in Light
+      }
     }
 
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
+    getColorString() {
+      const theme = document.documentElement.getAttribute("data-theme") || "dark";
+      if (theme === "light") {
+        if (this.colorType === "primary") return "100, 116, 139"; // Slate gray
+        if (this.colorType === "secondary") return "14, 165, 233"; // Sky Blue
+        return "217, 119, 6"; // Rich amber
+      } else {
+        if (this.colorType === "primary") return "255, 255, 255"; // Silver/White
+        if (this.colorType === "secondary") return "251, 191, 36"; // Gold
+        return "255, 138, 61"; // Amber
+      }
+    }
+
+    update(time) {
+      // 1. Gentle organic breathing (drifting)
+      this.vx += Math.sin(time * this.breathingSpeed + this.phase) * 0.001;
+      this.vy += Math.cos(time * this.breathingSpeed + this.phase) * 0.001;
+
+      // 2. Faint gravity pull towards the hero section to maintain density gradient
+      const targetX = isMobile ? width * 0.5 : width * 0.3;
+      const targetY = isMobile ? height * 0.4 : height * 0.5;
+      const gx = (targetX - this.homeX) * 0.000003 * (this.z / 2.5);
+      const gy = (targetY - this.homeY) * 0.000003 * (this.z / 2.5);
+      this.vx += gx;
+      this.vy += gy;
+
+      // Cap speed to maintain slow organic movement
+      const speed = Math.hypot(this.vx, this.vy);
+      const maxSpeed = 0.18 * (this.z / 2.5);
+      if (speed > maxSpeed) {
+        this.vx = (this.vx / speed) * maxSpeed;
+        this.vy = (this.vy / speed) * maxSpeed;
+      }
+
+      // Update home coordinates
+      this.homeX += this.vx;
+      this.homeY += this.vy;
 
       // Boundaries wrap
-      if (this.x < 0) this.x = width;
-      if (this.x > width) this.x = 0;
-      if (this.y < 0) this.y = height;
-      if (this.y > height) this.y = 0;
+      if (this.homeX < 0) this.homeX = width;
+      if (this.homeX > width) this.homeX = 0;
+      if (this.homeY < 0) this.homeY = height;
+      if (this.homeY > height) this.homeY = 0;
 
-      // Node activation decay
+      // 3. Elastic mouse attraction: Nodes pull towards mouse, relax back to home coordinates
+      if (mouse.x !== null && !isMobile) {
+        const dx = mouse.x - this.homeX;
+        const dy = mouse.y - this.homeY;
+        const distSq = dx * dx + dy * dy;
+
+        // Performant distance check using distance-squared comparisons (avoids Math.sqrt unless inside range)
+        if (distSq < mouseRadiusSq) {
+          const dist = Math.sqrt(distSq);
+          const pull = (mouse.radius - dist) / mouse.radius;
+          const targetX = this.homeX + (mouse.x - this.homeX) * pull * 0.28;
+          const targetY = this.homeY + (mouse.y - this.homeY) * pull * 0.28;
+          
+          this.x += (targetX - this.x) * 0.1;
+          this.y += (targetY - this.y) * 0.1;
+          this.alpha = Math.min(0.85, this.baseAlpha + pull * 0.25);
+        } else {
+          // Relax back to home coordinate
+          this.x += (this.homeX - this.x) * 0.08;
+          this.y += (this.homeY - this.y) * 0.08;
+          this.alpha += (this.baseAlpha - this.alpha) * 0.05;
+        }
+      } else {
+        // No interaction: Sync positions directly
+        this.x += (this.homeX - this.x) * 0.1;
+        this.y += (this.homeY - this.y) * 0.1;
+        this.alpha += (this.baseAlpha - this.alpha) * 0.05;
+      }
+
+      // Node activation decay (for shockwaves)
       if (this.activated > 0) {
         this.activated -= 0.015;
         if (this.activated < 0) this.activated = 0;
       }
-
-      // Cursor pull (desktop only) — capped so nodes can't collapse onto one point.
-      // Without a minimum-approach floor, pull keeps applying every frame the
-      // mouse rests still, and nodes asymptotically converge onto the cursor —
-      // this is what produced the "collapsed kite" artifact.
-      if (mouse.x !== null && !isMobile) {
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.hypot(dx, dy);
-        const minApproach = 24;
-
-        if (dist < mouse.radius && dist > minApproach) {
-          const pull = (mouse.radius - dist) / mouse.radius;
-          this.x += (dx / dist) * pull * 0.35;
-          this.y += (dy / dist) * pull * 0.35;
-          this.alpha = Math.min(0.7, this.baseAlpha + pull * 0.35);
-        } else if (dist <= minApproach) {
-          this.alpha = Math.min(0.7, this.baseAlpha + 0.35);
-        } else {
-          // Return to base alpha
-          this.alpha += (this.baseAlpha - this.alpha) * 0.05;
-        }
-      }
     }
 
     draw() {
+      const colorStr = this.getColorString();
+      // Subtle premium glowing halo for foreground nodes to make them feel luminous
+      if (this.z > 1.5) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${colorStr}, ${this.alpha * 0.18})`;
+        ctx.fill();
+      }
+
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      // Blend activated amber color with base alpha
-      const amberGlow = Math.min(0.85, this.alpha + this.activated * 0.5);
-      ctx.fillStyle = this.activated > 0.05 
-        ? `rgba(255, 138, 61, ${amberGlow})` 
-        : `rgba(142, 154, 168, ${this.alpha})`;
+      if (this.activated > 0.05) {
+        ctx.fillStyle = `rgba(${colorStr}, ${Math.min(0.95, this.alpha + this.activated * 0.6)})`;
+      } else {
+        ctx.fillStyle = `rgba(${colorStr}, ${this.alpha})`;
+      }
       ctx.fill();
     }
   }
 
   function initNodes() {
     nodes.length = 0;
+    pulses.length = 0;
     for (let i = 0; i < nodeCount; i++) {
       nodes.push(new Node());
     }
   }
 
-  function animate() {
+  function animate(timestamp) {
+    const time = timestamp || 0;
     ctx.clearRect(0, 0, width, height);
 
-    // Update and draw nodes
-    nodes.forEach(n => {
-      n.update();
-      n.draw();
-    });
+    // Update nodes
+    nodes.forEach(n => n.update(time));
 
-    // Shockwave logic
+    // Draw all particles (simplified rendering loop, no slow filters)
+    nodes.forEach(n => n.draw());
+
+    // Shockwave expansion logic
     if (isMouseDown) {
-      pulseRadius += 8.5; // Expand shockwave ring
+      pulseRadius += 8.5;
       
-      // Trigger activations as circle passes over nodes
+      const minR = pulseRadius - 30;
+      const maxR = pulseRadius + 30;
+      const minRSq = minR * minR;
+      const maxRSq = maxR * maxR;
+
       nodes.forEach(n => {
         const dx = n.x - pulseCenter.x;
         const dy = n.y - pulseCenter.y;
-        const dist = Math.hypot(dx, dy);
+        const distSq = dx * dx + dy * dy;
 
-        if (Math.abs(dist - pulseRadius) < 30) {
-          n.activated = 1.0;
+        // Performant squared distance test (no square root calls for out-of-range elements)
+        if (distSq > minRSq && distSq < maxRSq) {
+          const dist = Math.sqrt(distSq);
+          if (Math.abs(dist - pulseRadius) < 30) {
+            n.activated = 1.0;
+          }
         }
       });
 
-      // Render faint shockwave circle
+      const theme = document.documentElement.getAttribute("data-theme") || "dark";
+      const glowColor = theme === "light" ? "217, 119, 6" : "255, 138, 61";
       ctx.beginPath();
       ctx.arc(pulseCenter.x, pulseCenter.y, pulseRadius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 138, 61, ${Math.max(0, 0.12 - pulseRadius / maxPulseRadius)})`;
+      ctx.strokeStyle = `rgba(${glowColor}, ${Math.max(0, 0.12 - pulseRadius / maxPulseRadius)})`;
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
@@ -605,67 +704,143 @@ function initNetwork(reducedMotion) {
       }
     }
 
-    // Draw connections between nodes
+    // Draw connections between nearby nodes
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
+        // Only connect nodes that are close in depth/z-index to make it look layered
+        if (Math.abs(nodes[i].z - nodes[j].z) > 0.8) continue;
+
         const dx = nodes[i].x - nodes[j].x;
         const dy = nodes[i].y - nodes[j].y;
-        const dist = Math.hypot(dx, dy);
+        const distSq = dx * dx + dy * dy;
 
-        if (dist < connectionDistance) {
-          const baseOpacity = (1 - dist / connectionDistance) * 0.12;
+        // Optimize distance evaluation: avoid Math.sqrt completely for distant nodes
+        if (distSq < connectionDistanceSq) {
+          const dist = Math.sqrt(distSq);
+          const avgZ = (nodes[i].z + nodes[j].z) / 2;
+          const depthFactor = avgZ / 2.5; 
+          const baseOpacity = (1 - dist / connectionDistance) * 0.22 * depthFactor;
 
-          // Cursor hover glowing
+          // Mouse proximity glowing lines
           let cursorGlow = 0;
           if (mouse.x !== null && !isMobile) {
-            const d1 = Math.hypot(nodes[i].x - mouse.x, nodes[i].y - mouse.y);
-            const d2 = Math.hypot(nodes[j].x - mouse.x, nodes[j].y - mouse.y);
-            if (d1 < mouse.radius || d2 < mouse.radius) {
+            const d1Sq = (nodes[i].x - mouse.x) * (nodes[i].x - mouse.x) + (nodes[i].y - mouse.y) * (nodes[i].y - mouse.y);
+            const d2Sq = (nodes[j].x - mouse.x) * (nodes[j].x - mouse.x) + (nodes[j].y - mouse.y) * (nodes[j].y - mouse.y);
+            
+            if (d1Sq < mouseRadiusSq || d2Sq < mouseRadiusSq) {
+              const d1 = Math.sqrt(d1Sq);
+              const d2 = Math.sqrt(d2Sq);
               const pull1 = d1 < mouse.radius ? (mouse.radius - d1) / mouse.radius : 0;
               const pull2 = d2 < mouse.radius ? (mouse.radius - d2) / mouse.radius : 0;
-              cursorGlow = Math.max(pull1, pull2) * 0.35;
+              cursorGlow = Math.max(pull1, pull2) * 0.28;
             }
           }
 
-          // Shockwave glowing
           const shockGlow = Math.max(nodes[i].activated, nodes[j].activated) * 0.55;
+          const finalOpacity = Math.min(0.65, baseOpacity + cursorGlow + shockGlow);
 
-          const finalOpacity = Math.min(0.7, baseOpacity + cursorGlow + shockGlow);
-          
           ctx.beginPath();
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
 
-          // Draw active channels in amber, and idle lines in slate-gray
-          if (shockGlow > 0.05 || cursorGlow > 0.05) {
-            ctx.strokeStyle = `rgba(255, 138, 61, ${finalOpacity})`;
-            ctx.lineWidth = shockGlow > 0.05 ? 1.0 : 0.7;
+          // Draw active channels in glowing amber, and idle lines in subtle gray-amber blend
+          const theme = document.documentElement.getAttribute("data-theme") || "dark";
+          if (theme === "light") {
+            if (shockGlow > 0.05 || cursorGlow > 0.05) {
+              ctx.strokeStyle = `rgba(217, 119, 6, ${finalOpacity * 0.95})`; // Contrast-enhanced amber
+              ctx.lineWidth = shockGlow > 0.05 ? 1.0 : 0.75;
+            } else {
+              ctx.strokeStyle = `rgba(148, 163, 184, ${finalOpacity * 0.5})`; // Soft slate link lines
+              ctx.lineWidth = 0.45;
+            }
           } else {
-            ctx.strokeStyle = `rgba(142, 154, 168, ${finalOpacity})`;
-            ctx.lineWidth = 0.5;
+            if (shockGlow > 0.05 || cursorGlow > 0.05) {
+              ctx.strokeStyle = `rgba(255, 138, 61, ${finalOpacity})`;
+              ctx.lineWidth = shockGlow > 0.05 ? 1.0 : 0.75;
+            } else {
+              ctx.strokeStyle = `rgba(180, 160, 145, ${finalOpacity * 0.8})`;
+              ctx.lineWidth = 0.45;
+            }
           }
           ctx.stroke();
         }
       }
     }
 
+    // Update and Draw Energy Pulses (Data Packets)
+    // Occasionally spawn new energy pulses
+    if (Math.random() < 0.03 && pulses.length < 8) {
+      const startNode = nodes[Math.floor(Math.random() * nodes.length)];
+      // Find valid neighbors using squared distance comparison
+      const neighbors = nodes.filter(n => {
+        if (n === startNode) return false;
+        const dx = n.x - startNode.x;
+        const dy = n.y - startNode.y;
+        return (dx * dx + dy * dy) < connectionDistanceSq;
+      });
+      
+      if (neighbors.length > 0) {
+        const targetNode = neighbors[Math.floor(Math.random() * neighbors.length)];
+        pulses.push({
+          from: startNode,
+          to: targetNode,
+          progress: 0,
+          speed: 0.008 + Math.random() * 0.012
+        });
+      }
+    }
+
+    // Render active pulses
+    for (let k = pulses.length - 1; k >= 0; k--) {
+      const p = pulses[k];
+      p.progress += p.speed;
+
+      if (p.progress >= 1) {
+        // 60% chance to propagate to next node
+        if (Math.random() < 0.6) {
+          const nextNode = p.to;
+          const neighbors = nodes.filter(n => {
+            if (n === p.from || n === nextNode) return false;
+            const dx = n.x - nextNode.x;
+            const dy = n.y - nextNode.y;
+            return (dx * dx + dy * dy) < connectionDistanceSq;
+          });
+          
+          if (neighbors.length > 0) {
+            p.from = nextNode;
+            p.to = neighbors[Math.floor(Math.random() * neighbors.length)];
+            p.progress = 0;
+            p.speed = 0.008 + Math.random() * 0.012;
+            continue;
+          }
+        }
+        pulses.splice(k, 1);
+        continue;
+      }
+
+      const x = p.from.x + (p.to.x - p.from.x) * p.progress;
+      const y = p.from.y + (p.to.y - p.from.y) * p.progress;
+
+      const pulseColor = p.from.getColorString();
+      ctx.beginPath();
+      ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${pulseColor}, 0.9)`;
+      ctx.fill();
+    }
+
     animationFrameId = requestAnimationFrame(animate);
   }
 
-  // Setup interaction listeners
-  const hero = document.getElementById("hero");
+  // Setup interaction listeners - globally bound for whole-site cursor reaction
   
   // Desktop movement
   if (!isMobile) {
     let idleTimeout = null;
-    hero.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+    window.addEventListener("mousemove", (e) => {
+      // The canvas is fixed, so mouse coordinates match client coordinates 1-to-1
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
 
-      // If the cursor stops moving (rests still), stop pulling nodes toward
-      // it after a short idle window — otherwise the pull force keeps being
-      // applied indefinitely at a frozen point.
       clearTimeout(idleTimeout);
       idleTimeout = setTimeout(() => {
         mouse.x = null;
@@ -673,17 +848,16 @@ function initNetwork(reducedMotion) {
       }, 400);
     });
 
-    hero.addEventListener("mouseleave", () => {
+    window.addEventListener("mouseleave", () => {
       clearTimeout(idleTimeout);
       mouse.x = null;
       mouse.y = null;
     });
 
     // Click and Hold trigger
-    hero.addEventListener("mousedown", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      pulseCenter.x = e.clientX - rect.left;
-      pulseCenter.y = e.clientY - rect.top;
+    window.addEventListener("mousedown", (e) => {
+      pulseCenter.x = e.clientX;
+      pulseCenter.y = e.clientY;
       pulseRadius = 0;
       isMouseDown = true;
     });
@@ -693,11 +867,10 @@ function initNetwork(reducedMotion) {
     });
   } else {
     // Mobile Touch Tap trigger
-    hero.addEventListener("touchstart", (e) => {
+    window.addEventListener("touchstart", (e) => {
       if (e.touches.length > 0) {
-        const rect = canvas.getBoundingClientRect();
-        pulseCenter.x = e.touches[0].clientX - rect.left;
-        pulseCenter.y = e.touches[0].clientY - rect.top;
+        pulseCenter.x = e.touches[0].clientX;
+        pulseCenter.y = e.touches[0].clientY;
         pulseRadius = 0;
         isMouseDown = true;
       }
@@ -707,22 +880,6 @@ function initNetwork(reducedMotion) {
       isMouseDown = false;
     }, { passive: true });
   }
-
-  // Viewport IntersectionObserver culling to freeze loop when scrolled
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        if (!animationFrameId && !reducedMotion) {
-          animate();
-        }
-      } else {
-        if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
-          animationFrameId = null;
-        }
-      }
-    });
-  }, { threshold: 0 });
 
   window.addEventListener("resize", resizeCanvas);
   window.addEventListener("load", resizeCanvas);
@@ -734,8 +891,23 @@ function initNetwork(reducedMotion) {
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
   } else {
-    observer.observe(hero);
+    animate();
   }
+
+  // Freeze animation loop entirely when browser tab is inactive to preserve CPU
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    } else {
+      if (!animationFrameId && !reducedMotion) {
+        animate();
+      }
+    }
+  }
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 }
 
 /* ==========================================
@@ -1037,5 +1209,42 @@ function initCodeTypewriter(reducedMotion) {
   }
 
   loop();
+}
+
+/* ==========================================
+   14. Programmatic Mailto Link Fallbacks
+   ========================================== */
+function initContactEmailLinks() {
+  const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
+  console.log("[LokiDev IDE] initContactEmailLinks: bound to", emailLinks.length, "elements");
+
+  emailLinks.forEach(link => {
+    link.addEventListener("click", function(e) {
+      console.log("[LokiDev IDE] mailto click detected on:", this);
+      e.preventDefault();
+      
+      const mailto = this.getAttribute("href");
+      console.log("[LokiDev IDE] mailto target URL:", mailto);
+      
+      if (mailto) {
+        // 1. Programmatic Mailto trigger
+        try {
+          window.location.href = mailto;
+          console.log("[LokiDev IDE] programmatic mailto navigation requested via window.location.href");
+        } catch (err) {
+          console.error("[LokiDev IDE] programmatic mailto navigation failed:", err);
+        }
+
+        // 2. Clipboard copy fallback (critical for sandboxed previews)
+        const email = mailto.replace("mailto:", "");
+        copyTextToClipboard(email, () => {
+          showToast("Email copied! (Opening mail client...)");
+          console.log("[LokiDev IDE] Email copied to clipboard successfully as fallback.");
+        }, () => {
+          showToast("Opening email client...");
+        });
+      }
+    });
+  });
 }
 
