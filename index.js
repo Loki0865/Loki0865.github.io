@@ -35,12 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
     anchor.addEventListener("click", function(e) {
       e.preventDefault();
       const targetId = this.getAttribute("href");
-      const target = document.querySelector(targetId);
-      if (target) {
+      const section = document.querySelector(targetId);
+      if (section) {
+        // Scroll to the inner container to bypass parent top padding, landing perfectly under the nav bar
+        const target = section.querySelector(".section-container") || section;
+        const scrollOffset = 80; // Navbar height (56px) + visual gap (24px)
+        
         if (lenisInstance) {
-          lenisInstance.scrollTo(target, { offset: -80 });
+          lenisInstance.scrollTo(target, { offset: -scrollOffset });
         } else {
-          const top = target.getBoundingClientRect().top + window.scrollY - 80;
+          const top = target.getBoundingClientRect().top + window.scrollY - scrollOffset;
           window.scrollTo({
             top,
             behavior: prefersReducedMotion ? "auto" : "smooth"
@@ -552,9 +556,9 @@ function initNetwork(reducedMotion) {
     getColorString() {
       const theme = document.documentElement.getAttribute("data-theme") || "dark";
       if (theme === "light") {
-        if (this.colorType === "primary") return "100, 116, 139"; // Slate gray
-        if (this.colorType === "secondary") return "14, 165, 233"; // Sky Blue
-        return "217, 119, 6"; // Rich amber
+        if (this.colorType === "primary") return "180, 180, 185"; // Silver/light gray
+        if (this.colorType === "secondary") return "245, 158, 11"; // Warm gold
+        return "217, 119, 6"; // Warm amber
       } else {
         if (this.colorType === "primary") return "255, 255, 255"; // Silver/White
         if (this.colorType === "secondary") return "251, 191, 36"; // Gold
@@ -747,10 +751,10 @@ function initNetwork(reducedMotion) {
           const theme = document.documentElement.getAttribute("data-theme") || "dark";
           if (theme === "light") {
             if (shockGlow > 0.05 || cursorGlow > 0.05) {
-              ctx.strokeStyle = `rgba(217, 119, 6, ${finalOpacity * 0.95})`; // Contrast-enhanced amber
+              ctx.strokeStyle = `rgba(217, 119, 6, ${finalOpacity * 1.1})`; // Contrast-enhanced amber
               ctx.lineWidth = shockGlow > 0.05 ? 1.0 : 0.75;
             } else {
-              ctx.strokeStyle = `rgba(148, 163, 184, ${finalOpacity * 0.5})`; // Soft slate link lines
+              ctx.strokeStyle = `rgba(180, 160, 145, ${finalOpacity * 0.75})`; // Soft warm silver/gray links
               ctx.lineWidth = 0.45;
             }
           } else {
@@ -920,10 +924,16 @@ function initKeyboardShortcuts() {
       e.preventDefault();
       const projectsSection = document.getElementById("projects");
       if (projectsSection) {
+        const target = projectsSection.querySelector(".section-container") || projectsSection;
+        const scrollOffset = 80;
         if (lenisInstance) {
-          lenisInstance.scrollTo(projectsSection, { offset: -80 });
+          lenisInstance.scrollTo(target, { offset: -scrollOffset });
         } else {
-          projectsSection.scrollIntoView({ behavior: "smooth" });
+          const top = target.getBoundingClientRect().top + window.scrollY - scrollOffset;
+          window.scrollTo({
+            top,
+            behavior: "smooth"
+          });
         }
       }
     }
