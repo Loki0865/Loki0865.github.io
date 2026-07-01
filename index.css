@@ -346,7 +346,7 @@ a {
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.25;
+  opacity: 0.95;
 }
 
 .hero-container {
@@ -386,6 +386,9 @@ a {
 @media (max-width: 1199px) {
   .hero-visual-col {
     margin-right: 0;
+  }
+  .section {
+    padding: var(--spacing-xl) 0; /* Compact 64px padding on laptop screen viewports */
   }
 }
 
@@ -435,6 +438,43 @@ a {
   letter-spacing: -0.03em;
   margin-bottom: var(--spacing-xxs);
   display: inline-block;
+
+  /* Premium Silver-White Gradient Sweep */
+  background: linear-gradient(
+    110deg,
+    #ffffff 35%,
+    #ffffff 45%,
+    #a1a1aa 50%,
+    #ffffff 55%,
+    #ffffff 65%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-sweep 7s ease-in-out infinite;
+
+  /* Clean interactive transition */
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, filter;
+  cursor: default;
+}
+
+.hero-title:hover {
+  transform: scale(1.018);
+  filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.16)) drop-shadow(0 0 16px rgba(255, 138, 61, 0.06));
+}
+
+@keyframes text-sweep {
+  0% {
+    background-position: 200% center;
+  }
+  30% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
 }
 
 .hero-subtitle-container {
@@ -444,6 +484,11 @@ a {
   letter-spacing: -0.01em;
   color: var(--accent);
   margin-bottom: var(--spacing-sm);
+}
+
+.hero-subtitle {
+  display: inline-block;
+  will-change: transform, opacity;
 }
 
 .hero-desc {
@@ -667,7 +712,7 @@ a {
 
 /* Section Grid layouts (8px base padding, desktop: 128px, mobile: 64px) */
 .section {
-  padding: var(--spacing-xxxl) 0;
+  padding: var(--spacing-xxl) 0; /* 96px top/bottom padding on larger desktop monitors */
   width: 100%;
   position: relative;
   background: radial-gradient(circle at 50% 50%, rgba(255, 138, 61, 0.02) 0%, transparent 65%);
@@ -1748,4 +1793,18 @@ a {
 .contact-secondary-btn:focus-visible {
   outline: 2px solid var(--accent) !important;
   outline-offset: 4px !important;
+}
+
+/* Auto-Typing Code Editor Caret */
+.typing-cursor {
+  display: inline-block;
+  color: var(--accent);
+  font-weight: bold;
+  animation: typing-cursor-blink 1.06s infinite step-end;
+  margin-left: 2px;
+}
+
+@keyframes typing-cursor-blink {
+  from, to { opacity: 0; }
+  50% { opacity: 1; }
 }

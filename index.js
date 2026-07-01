@@ -20,12 +20,34 @@ document.addEventListener("DOMContentLoaded", () => {
   initProjectFilter();
   initLenis(prefersReducedMotion);
   initHeadlineReveal(prefersReducedMotion);
+  initSubtitleRotation(prefersReducedMotion);
   initStatsCounter(prefersReducedMotion);
   initNetwork(prefersReducedMotion);
+  initCodeTypewriter(prefersReducedMotion);
   initKeyboardShortcuts();
   initScrollTop();
   initMobileNav();
   initMagneticButtons(prefersReducedMotion);
+
+  // Bind custom glass nav clicks globally (with fallback smooth scrolling)
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener("click", function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute("href");
+      const target = document.querySelector(targetId);
+      if (target) {
+        if (lenisInstance) {
+          lenisInstance.scrollTo(target, { offset: -80 });
+        } else {
+          const top = target.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({
+            top,
+            behavior: prefersReducedMotion ? "auto" : "smooth"
+          });
+        }
+      }
+    });
+  });
 });
 
 /* ==========================================
@@ -233,18 +255,6 @@ function initLenis(reducedMotion) {
   if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
     gsap.ticker.lagSmoothing(0);
   }
-
-  // Bind custom glass nav clicks
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute("href");
-      const target = document.querySelector(targetId);
-      if (target) {
-        lenisInstance.scrollTo(target, { offset: -30 });
-      }
-    });
-  });
 }
 
 /* ==========================================
@@ -261,24 +271,27 @@ function initHeadlineReveal(reducedMotion) {
     return;
   }
 
-  // Split text into words wrapped in overflow-hidden spans
-  const text = title.textContent.trim();
-  title.innerHTML = text.split(" ").map(word => 
-    `<span class="split-word-wrapper" style="display:inline-block; overflow:hidden;">
-       <span class="split-word" style="display:inline-block; transform:translateY(25px); opacity:0; filter:blur(6px);">${word}</span>
-      </span>`
-  ).join(" ");
-
-  const tl = gsap.timeline({ delay: 0.1 });
-  
-  tl.to(".split-word", {
-    y: "0%",
-    opacity: 1,
-    filter: "blur(0px)",
-    duration: 0.85,
-    ease: "power3.out",
-    stagger: 0.07
+  const tl = gsap.timeline({
+    delay: 0.1,
+    onComplete: () => {
+      // Dispatches the complete event to start subtitle typing sequence
+      window.dispatchEvent(new Event("hero-reveal-complete"));
+    }
   });
+
+  // Smooth, premium, Apple/Vercel-style slide-up and fade reveal of the entire title
+  tl.fromTo(title,
+    {
+      y: 20,
+      opacity: 0
+    },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.95,
+      ease: "power3.out"
+    }
+  );
 
   // Stagger reveal other items
   const subtitle = document.querySelector(".hero-subtitle-container");
@@ -287,11 +300,11 @@ function initHeadlineReveal(reducedMotion) {
   const shortcutHint = document.querySelector(".hero-shortcuts-hint");
   const visualCol = document.querySelector(".hero-visual-col");
 
-  if (subtitle) tl.from(subtitle, { opacity: 0, y: 12, duration: 0.4, ease: "power2.out" }, "-=0.5");
-  if (desc) tl.from(desc, { opacity: 0, y: 12, duration: 0.4, ease: "power2.out" }, "-=0.45");
-  if (actions) tl.from(actions, { opacity: 0, y: 12, duration: 0.4, ease: "power2.out" }, "-=0.4");
-  if (shortcutHint) tl.from(shortcutHint, { opacity: 0, y: 8, duration: 0.4, ease: "power2.out" }, "-=0.35");
-  if (visualCol) tl.from(visualCol, { opacity: 0, scale: 0.97, duration: 0.7, ease: "power2.out" }, "-=0.6");
+  if (subtitle) tl.from(subtitle, { opacity: 0, y: 12, duration: 0.45, ease: "power2.out" }, "-=0.65");
+  if (desc) tl.from(desc, { opacity: 0, y: 12, duration: 0.45, ease: "power2.out" }, "-=0.6");
+  if (actions) tl.from(actions, { opacity: 0, y: 12, duration: 0.45, ease: "power2.out" }, "-=0.55");
+  if (shortcutHint) tl.from(shortcutHint, { opacity: 0, y: 8, duration: 0.45, ease: "power2.out" }, "-=0.5");
+  if (visualCol) tl.from(visualCol, { opacity: 0, scale: 0.98, duration: 0.75, ease: "power2.out" }, "-=0.75");
 
   // Scroll Trigger Section Reveals
   if (typeof ScrollTrigger !== "undefined") {
@@ -309,6 +322,104 @@ function initHeadlineReveal(reducedMotion) {
       });
     });
   }
+}
+
+/* ==========================================
+   7.5. Subtitle Role Rotation Loop
+   ========================================== */
+function initSubtitleRotation(reducedMotion) {
+  const subtitle = document.querySelector(".hero-subtitle");
+  if (!subtitle) return;
+
+  const roles = [
+    "Software Engineer",
+    "AI Engineer"
+  ];
+
+  if (reducedMotion) {
+    subtitle.textContent = roles.join(" · ");
+    return;
+  }
+
+  let currentRoleIdx = 0;
+  let isTyping = false;
+
+  // Append a blinking terminal cursor to the subtitle container
+  const container = document.querySelector(".hero-subtitle-container");
+  if (container) {
+    let cursor = container.querySelector(".hero-subtitle-cursor");
+    if (!cursor) {
+      cursor = document.createElement("span");
+      cursor.className = "hero-subtitle-cursor";
+      cursor.textContent = "|";
+      cursor.style.display = "inline-block";
+      cursor.style.marginLeft = "4px";
+      cursor.style.color = "var(--accent)";
+      cursor.style.fontWeight = "600";
+      cursor.style.animation = "cursor-blink 0.85s step-end infinite";
+      
+      // Inject keyframes stylesheet if not already created
+      if (!document.getElementById("cursor-blink-style")) {
+        const style = document.createElement("style");
+        style.id = "cursor-blink-style";
+        style.textContent = `
+          @keyframes cursor-blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      container.appendChild(cursor);
+    }
+  }
+
+  function typeWriterEffect(newText, callback) {
+    let currentText = subtitle.textContent;
+    let i = currentText.length;
+
+    // Erase the old text character by character
+    function erase() {
+      if (i > 0) {
+        subtitle.textContent = currentText.substring(0, i - 1);
+        i--;
+        setTimeout(erase, 35 + Math.random() * 25); // Slightly slower, premium erasing
+      } else {
+        // Type the new text character by character
+        let j = 0;
+        function type() {
+          if (j < newText.length) {
+            subtitle.textContent = newText.substring(0, j + 1);
+            j++;
+            setTimeout(type, 80 + Math.random() * 60); // Slower, premium typing cadence
+          } else {
+            isTyping = false;
+            if (callback) callback();
+          }
+        }
+        setTimeout(type, 350); // Pause before starting to type the new role
+      }
+    }
+    erase();
+  }
+
+  function rotateSubtitle() {
+    if (isTyping) return;
+    isTyping = true;
+    currentRoleIdx = (currentRoleIdx + 1) % roles.length;
+    const nextRole = roles[currentRoleIdx];
+
+    typeWriterEffect(nextRole, () => {
+      // Hold the role for 4 seconds before rotating to the next one
+      setTimeout(rotateSubtitle, 4000);
+    });
+  }
+
+  // Start the typing cycle after the name reveal animation is fully complete
+  window.addEventListener("hero-reveal-complete", () => {
+    // Show the first role for 3.5 seconds before starting the first deletion
+    setTimeout(rotateSubtitle, 3500);
+  });
 }
 
 /* ==========================================
@@ -373,18 +484,17 @@ function initNetwork(reducedMotion) {
 
   // Set dimensions
   function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    width = rect.width;
-    height = rect.height;
+    if (!canvas.parentElement) return;
+    const parentRect = canvas.parentElement.getBoundingClientRect();
+    width = parentRect.width;
+    height = parentRect.height;
 
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    if (nodes.length === 0) {
-      initNodes();
-    }
+    initNodes();
   }
 
   class Node {
@@ -395,7 +505,7 @@ function initNetwork(reducedMotion) {
       this.vx = (Math.random() - 0.5) * 0.08;
       this.vy = (Math.random() - 0.5) * 0.08;
       this.radius = Math.random() * 1.5 + 0.8; // Small grid dots
-      this.baseAlpha = Math.random() * 0.2 + 0.1;
+      this.baseAlpha = Math.random() * 0.35 + 0.35;
       this.alpha = this.baseAlpha;
       this.activated = 0; // Shockwave propagation factor
     }
@@ -416,18 +526,23 @@ function initNetwork(reducedMotion) {
         if (this.activated < 0) this.activated = 0;
       }
 
-      // Cursor pull (desktop only)
+      // Cursor pull (desktop only) — capped so nodes can't collapse onto one point.
+      // Without a minimum-approach floor, pull keeps applying every frame the
+      // mouse rests still, and nodes asymptotically converge onto the cursor —
+      // this is what produced the "collapsed kite" artifact.
       if (mouse.x !== null && !isMobile) {
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.hypot(dx, dy);
+        const minApproach = 24;
 
-        if (dist < mouse.radius) {
+        if (dist < mouse.radius && dist > minApproach) {
           const pull = (mouse.radius - dist) / mouse.radius;
-          // Draw node coordinates slightly towards cursor
           this.x += (dx / dist) * pull * 0.35;
           this.y += (dy / dist) * pull * 0.35;
           this.alpha = Math.min(0.7, this.baseAlpha + pull * 0.35);
+        } else if (dist <= minApproach) {
+          this.alpha = Math.min(0.7, this.baseAlpha + 0.35);
         } else {
           // Return to base alpha
           this.alpha += (this.baseAlpha - this.alpha) * 0.05;
@@ -498,7 +613,7 @@ function initNetwork(reducedMotion) {
         const dist = Math.hypot(dx, dy);
 
         if (dist < connectionDistance) {
-          const baseOpacity = (1 - dist / connectionDistance) * 0.08;
+          const baseOpacity = (1 - dist / connectionDistance) * 0.12;
 
           // Cursor hover glowing
           let cursorGlow = 0;
@@ -542,13 +657,24 @@ function initNetwork(reducedMotion) {
   
   // Desktop movement
   if (!isMobile) {
+    let idleTimeout = null;
     hero.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
+
+      // If the cursor stops moving (rests still), stop pulling nodes toward
+      // it after a short idle window — otherwise the pull force keeps being
+      // applied indefinitely at a frozen point.
+      clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(() => {
+        mouse.x = null;
+        mouse.y = null;
+      }, 400);
     });
 
     hero.addEventListener("mouseleave", () => {
+      clearTimeout(idleTimeout);
       mouse.x = null;
       mouse.y = null;
     });
@@ -599,6 +725,8 @@ function initNetwork(reducedMotion) {
   }, { threshold: 0 });
 
   window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("load", resizeCanvas);
+  window.addEventListener("hero-reveal-complete", resizeCanvas);
   resizeCanvas();
 
   if (reducedMotion) {
@@ -621,7 +749,7 @@ function initKeyboardShortcuts() {
       const projectsSection = document.getElementById("projects");
       if (projectsSection) {
         if (lenisInstance) {
-          lenisInstance.scrollTo(projectsSection, { offset: -30 });
+          lenisInstance.scrollTo(projectsSection, { offset: -80 });
         } else {
           projectsSection.scrollIntoView({ behavior: "smooth" });
         }
@@ -708,5 +836,206 @@ function initMagneticButtons(reducedMotion) {
       btn.style.transition = "transform 300ms cubic-bezier(0.16, 1, 0.3, 1)";
     });
   });
+}
+
+function initCodeTypewriter(reducedMotion) {
+  const codeContainer = document.getElementById("ide-code-container");
+  const filenameEl = document.getElementById("ide-filename");
+  const activeTabEl = document.getElementById("ide-active-tab");
+  if (!codeContainer || !filenameEl || !activeTabEl) return;
+
+  const snippets = [
+    {
+      filename: "pipeline.py",
+      tokens: [
+        { text: "import", type: "keyword" },
+        { text: " gemini, scraper\n\n" },
+        { text: "class", type: "keyword" },
+        { text: " " },
+        { text: "IndustryIntelligencePipeline", type: "type" },
+        { text: ":\n    " },
+        { text: "def", type: "keyword" },
+        { text: " " },
+        { text: "__init__", type: "func" },
+        { text: "(self):\n        self.llm = gemini.GenerativeModel(" },
+        { text: '"gemini-1.5-flash"', type: "string" },
+        { text: ")\n        self.sources = [" },
+        { text: '"news_api"', type: "string" },
+        { text: ", " },
+        { text: '"twitter"', type: "string" },
+        { text: "]\n\n    " },
+        { text: "async def", type: "keyword" },
+        { text: " " },
+        { text: "process_market_intel", type: "func" },
+        { text: "(self, topic):\n        " },
+        { text: "# Extract intelligence telemetry", type: "comment" },
+        { text: "\n        raw_data = " },
+        { text: "await", type: "keyword" },
+        { text: " scraper.fetch_feeds(topic)\n        analysis = self.llm.analyze(raw_data)\n        " },
+        { text: "return", type: "keyword" },
+        { text: " {\n            " },
+        { text: '"topic"', type: "string" },
+        { text: ": topic, " },
+        { text: '"sentiment"', type: "string" },
+        { text: ": analysis.sentiment\n        }" }
+      ]
+    },
+    {
+      filename: "vault.ts",
+      tokens: [
+        { text: "import", type: "keyword" },
+        { text: " crypto " },
+        { text: "from", type: "keyword" },
+        { text: " " },
+        { text: '"crypto"', type: "string" },
+        { text: ";\n\n" },
+        { text: "export class", type: "keyword" },
+        { text: " " },
+        { text: "LokiVault", type: "type" },
+        { text: " {\n  " },
+        { text: "encrypt", type: "func" },
+        { text: "(plaintext: string, secretKey: Buffer) {\n    " },
+        { text: "const", type: "keyword" },
+        { text: " iv = crypto.randomBytes(16);\n    " },
+        { text: "const", type: "keyword" },
+        { text: " cipher = crypto.createCipheriv(" },
+        { text: '"aes-256-gcm"', type: "string" },
+        { text: ", secretKey, iv);\n    " },
+        { text: "const", type: "keyword" },
+        { text: " encrypted = Buffer.concat([\n      cipher.update(plaintext, " },
+        { text: '"utf8"', type: "string" },
+        { text: "),\n      cipher.final()\n    ]);\n    " },
+        { text: "return", type: "keyword" },
+        { text: " {\n      iv: iv.toString(" },
+        { text: '"hex"', type: "string" },
+        { text: "),\n      content: encrypted.toString(" },
+        { text: '"hex"', type: "string" },
+        { text: "),\n      tag: cipher.getAuthTag().toString(" },
+        { text: '"hex"', type: "string" },
+        { text: ")\n    };\n  }\n}" }
+      ]
+    },
+    {
+      filename: "autofill.js",
+      tokens: [
+        { text: "async function", type: "keyword" },
+        { text: " " },
+        { text: "autofillFormFields", type: "func" },
+        { text: "(tabId, profileData) {\n  " },
+        { text: "const", type: "keyword" },
+        { text: " fields = " },
+        { text: "await", type: "keyword" },
+        { text: " queryFormInputs(tabId);\n  \n  " },
+        { text: "for", type: "keyword" },
+        { text: " (" },
+        { text: "const", type: "keyword" },
+        { text: " field " },
+        { text: "of", type: "keyword" },
+        { text: " fields) {\n    " },
+        { text: "const", type: "keyword" },
+        { text: " match = " },
+        { text: "await", type: "keyword" },
+        { text: " matchFieldWithAI(field, profileData);\n    " },
+        { text: "if", type: "keyword" },
+        { text: " (match) {\n      " },
+        { text: "await", type: "keyword" },
+        { text: " chrome.scripting.executeScript({\n        target: { tabId },\n        func: (id, val) => { document.getElementById(id).value = val; },\n        args: [field.id, match.value]\n      });\n    }\n  }\n}" }
+      ]
+    }
+  ];
+
+  // Helper to compile tokens to flat character structures
+  snippets.forEach(snip => {
+    snip.chars = [];
+    snip.tokens.forEach(tok => {
+      for (let i = 0; i < tok.text.length; i++) {
+        snip.chars.push({ char: tok.text[i], type: tok.type });
+      }
+    });
+  });
+
+  // Respect reduced motion request
+  if (reducedMotion) {
+    renderSnippet(snippets[0], snippets[0].chars.length);
+    return;
+  }
+
+  let activeIndex = 0;
+  let charIndex = 0;
+  let isErasing = false;
+  let typingTimeout = null;
+  let isHeroVisible = true;
+
+  function renderSnippet(snip, n) {
+    filenameEl.textContent = `${snip.filename} — LokiDev IDE`;
+    activeTabEl.querySelector("span").textContent = snip.filename;
+
+    let html = "";
+    let currentType = null;
+    for (let i = 0; i < n; i++) {
+      const c = snip.chars[i];
+      if (c.type !== currentType) {
+        if (currentType) html += "</span>";
+        if (c.type) html += `<span class="code-${c.type}">`;
+        currentType = c.type;
+      }
+      if (c.char === "<") html += "&lt;";
+      else if (c.char === ">") html += "&gt;";
+      else if (c.char === "&") html += "&amp;";
+      else html += c.char;
+    }
+    if (currentType) html += "</span>";
+
+    // Append cursor
+    html += '<span class="typing-cursor">|</span>';
+    codeContainer.innerHTML = html;
+  }
+
+  function loop() {
+    if (!isHeroVisible) {
+      typingTimeout = setTimeout(loop, 200);
+      return;
+    }
+
+    const currentSnippet = snippets[activeIndex];
+
+    if (!isErasing) {
+      if (charIndex < currentSnippet.chars.length) {
+        charIndex++;
+        renderSnippet(currentSnippet, charIndex);
+        const speed = 15 + Math.random() * 15;
+        typingTimeout = setTimeout(loop, speed);
+      } else {
+        isErasing = true;
+        typingTimeout = setTimeout(loop, 2500); // Pause for 2.5s
+      }
+    } else {
+      if (charIndex > 0) {
+        charIndex--;
+        renderSnippet(currentSnippet, charIndex);
+        typingTimeout = setTimeout(loop, 5); // Fast backspace
+      } else {
+        isErasing = false;
+        activeIndex = (activeIndex + 1) % snippets.length;
+        typingTimeout = setTimeout(loop, 400); // Pause before typing next file
+      }
+    }
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        isHeroVisible = entry.isIntersecting;
+      });
+    },
+    { threshold: 0.05 }
+  );
+
+  const heroSection = document.getElementById("hero");
+  if (heroSection) {
+    observer.observe(heroSection);
+  }
+
+  loop();
 }
 
