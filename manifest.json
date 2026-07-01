@@ -1,0 +1,16 @@
+{
+  "short_name": "LokiDev",
+  "name": "Lokesh Alasandi — Portfolio",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0A0A0B",
+  "theme_color": "#FF8A3D",
+  "display": "standalone",
+  "orientation": "portrait"
+}

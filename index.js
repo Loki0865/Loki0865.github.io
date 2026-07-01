@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileNav();
   initMagneticButtons(prefersReducedMotion);
   initContactEmailLinks();
+  initActionToasts();
+  initResumeDownloadFeedback();
 
   // Bind custom glass nav clicks globally (with fallback smooth scrolling)
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -89,29 +91,68 @@ function initThemeToggle() {
 }
 
 /* ==========================================
-   2. Active Navigation Highlight
+   2. Active Navigation Highlight + Progress Bar
    ========================================== */
 function initActiveNavHighlight() {
-  const navLinks = document.querySelectorAll(".nav-link");
-  const sections = document.querySelectorAll("section, header");
+  const navLinks = document.querySelectorAll(".nav-link[data-section]");
+  const progressBar = document.getElementById("scroll-progress");
 
-  window.addEventListener("scroll", () => {
-    let current = "";
-    sections.forEach(section => {
-      const sectionTop = section.offsetTop;
-      const sectionHeight = section.clientHeight;
-      if (window.scrollY >= sectionTop - 120) {
-        current = section.getAttribute("id");
+  // --- Scroll Progress Bar ---
+  function updateProgressBar() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    if (progressBar) progressBar.style.width = `${Math.min(pct, 100)}%`;
+  }
+
+  // --- Scroll-spy: IntersectionObserver-based for accuracy ---
+  const sectionMap = {};
+  navLinks.forEach(link => {
+    const sectionId = link.getAttribute("data-section");
+    const section = document.getElementById(sectionId);
+    if (section) sectionMap[sectionId] = section;
+  });
+
+  const activeSections = new Set();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        activeSections.add(entry.target.id);
+      } else {
+        activeSections.delete(entry.target.id);
+      }
+    });
+
+    // Set active link to topmost visible section
+    let activeId = null;
+    navLinks.forEach(link => {
+      const sectionId = link.getAttribute("data-section");
+      if (activeSections.has(sectionId)) {
+        if (!activeId) activeId = sectionId;
       }
     });
 
     navLinks.forEach(link => {
-      link.classList.remove("active");
-      if (link.getAttribute("href") === `#${current}`) {
-        link.classList.add("active");
+      const sectionId = link.getAttribute("data-section");
+      const isActive = sectionId === activeId;
+      link.classList.toggle("active", isActive);
+      if (isActive) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
       }
     });
+  }, {
+    threshold: 0.25,
+    rootMargin: "-56px 0px -40% 0px" // Account for fixed navbar
   });
+
+  Object.values(sectionMap).forEach(section => observer.observe(section));
+
+  // Bind progress bar update to scroll
+  window.addEventListener("scroll", updateProgressBar, { passive: true });
+  updateProgressBar(); // Run on init
 }
 
 
@@ -182,6 +223,8 @@ function showToast(message) {
 
   const toast = document.createElement("div");
   toast.className = "custom-toast";
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
   toast.textContent = message;
   document.body.appendChild(toast);
 
@@ -555,15 +598,29 @@ function initNetwork(reducedMotion) {
 
     getColorString() {
       const theme = document.documentElement.getAttribute("data-theme") || "dark";
+
+      // Target colors per theme
+      let targetR, targetG, targetB;
       if (theme === "light") {
-        if (this.colorType === "primary") return "180, 180, 185"; // Silver/light gray
-        if (this.colorType === "secondary") return "245, 158, 11"; // Warm gold
-        return "217, 119, 6"; // Warm amber
+        if (this.colorType === "primary")   { targetR = 180; targetG = 180; targetB = 185; }
+        else if (this.colorType === "secondary") { targetR = 245; targetG = 158; targetB = 11; }
+        else                                { targetR = 217; targetG = 119; targetB = 6; }
       } else {
-        if (this.colorType === "primary") return "255, 255, 255"; // Silver/White
-        if (this.colorType === "secondary") return "251, 191, 36"; // Gold
-        return "255, 138, 61"; // Amber
+        if (this.colorType === "primary")   { targetR = 255; targetG = 255; targetB = 255; }
+        else if (this.colorType === "secondary") { targetR = 251; targetG = 191; targetB = 36; }
+        else                                { targetR = 255; targetG = 138; targetB = 61; }
       }
+
+      // Initialize current channels on first call
+      if (this.currentR === undefined) { this.currentR = targetR; this.currentG = targetG; this.currentB = targetB; }
+
+      // Smooth interpolation (lerp) towards target — 4% per frame for ~1s transition at 60fps
+      const speed = 0.04;
+      this.currentR += (targetR - this.currentR) * speed;
+      this.currentG += (targetG - this.currentG) * speed;
+      this.currentB += (targetB - this.currentB) * speed;
+
+      return `${Math.round(this.currentR)}, ${Math.round(this.currentG)}, ${Math.round(this.currentB)}`;
     }
 
     update(time) {
@@ -1248,7 +1305,7 @@ function initContactEmailLinks() {
         // 2. Clipboard copy fallback (critical for sandboxed previews)
         const email = mailto.replace("mailto:", "");
         copyTextToClipboard(email, () => {
-          showToast("Email copied! (Opening mail client...)");
+          showToast("✓ Email copied! Opening mail client...");
           console.log("[LokiDev IDE] Email copied to clipboard successfully as fallback.");
         }, () => {
           showToast("Opening email client...");
@@ -1258,3 +1315,78 @@ function initContactEmailLinks() {
   });
 }
 
+/* ==========================================
+   15. Action Feedback Toasts (GitHub, LinkedIn, Social)
+   ========================================== */
+function initActionToasts() {
+  // Intercept GitHub links
+  document.querySelectorAll('a[href*="github.com"]').forEach(link => {
+    // Skip project links that already have their own labelling
+    link.addEventListener("click", () => {
+      showToast("Opening GitHub 🚀");
+    });
+  });
+
+  // Intercept LinkedIn links
+  document.querySelectorAll('a[href*="linkedin.com"]').forEach(link => {
+    link.addEventListener("click", () => {
+      showToast("Opening LinkedIn 💼");
+    });
+  });
+
+  // Footer email link (already handled by initContactEmailLinks, but footer ones may differ)
+  document.querySelectorAll('.footer-social-links a[href^="mailto:"]').forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const mailto = link.getAttribute("href");
+      if (mailto) window.location.href = mailto;
+      const email = mailto.replace("mailto:", "");
+      copyTextToClipboard(email, () => {
+        showToast("✓ Email copied! Opening mail client...");
+      }, () => {
+        showToast("Opening email client...");
+      });
+    });
+  });
+}
+
+/* ==========================================
+   16. Resume Download Micro-Interaction (400ms snappy)
+   ========================================== */
+function initResumeDownloadFeedback() {
+  const resumeLinks = document.querySelectorAll('a[download]');
+  resumeLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // Store original children HTML
+      const originalHTML = link.innerHTML;
+      const isDisabled = link.getAttribute("data-downloading") === "true";
+      if (isDisabled) return;
+
+      link.setAttribute("data-downloading", "true");
+
+      // Swap to loading state
+      link.innerHTML = `<span>Preparing... ⏳</span>`;
+      showToast("Preparing Lokesh's Resume 📄");
+
+      setTimeout(() => {
+        // Trigger actual download
+        const downloadLink = document.createElement("a");
+        downloadLink.href = link.getAttribute("href") || "resume.pdf";
+        downloadLink.download = link.getAttribute("download") || "Lokesh_Alasandi_Resume.pdf";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        showToast("✓ Resume downloaded!");
+
+        // Restore original button
+        setTimeout(() => {
+          link.innerHTML = originalHTML;
+          link.removeAttribute("data-downloading");
+        }, 800);
+      }, 400);
+    });
+  });
+}

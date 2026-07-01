@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- Canonical & Robots SEO -->
+  <link rel="canonical" href="https://lokeshalasandi.github.io/">
+  <meta name="robots" content="index, follow">
+  
   <!-- OG Meta Tags + SEO -->
   <meta name="description" content="Lokesh Alasandi — Software & AI Engineer. Experienced in C++, Python, LLMs, and systems development. Graduate of Vasavi College of Engineering.">
   <meta property="og:title" content="Lokesh Alasandi — Software & AI Engineer">
@@ -17,13 +21,20 @@
   
   <title>Lokesh Alasandi — Software & AI Engineer</title>
   
-  <!-- Fonts -->
+  <!-- Favicon & Web App Manifest -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF8A3D">
+  
+  <!-- Preconnect and Preload Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&family=Geist:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&family=Geist:wght@400;600&display=swap" as="style">
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&family=Geist:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="index.css?v=8">
+  <link rel="stylesheet" href="index.css?v=9">
   
   <!-- Deferred CDN Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
@@ -502,10 +513,10 @@
         <div class="project-row reveal-on-scroll" data-categories="ai-ml">
           <div class="project-row-main">
             <span class="project-row-index">01</span>
-            <i data-lucide="activity" class="project-row-icon"></i>
+            <i data-lucide="activity" class="project-row-icon" aria-hidden="true"></i>
             <div class="project-row-text">
               <h3 class="project-row-title">Real-Time Industry Intelligence System</h3>
-              <p class="project-row-desc">Data pipeline tool that aggregates news, Twitter, and public datasets using language models to detect competitor moves and market trends in near real-time. Designed and deployed during the Infosys Springboard internship.</p>
+              <p class="project-row-desc">Data pipeline platform that aggregates news feeds, Twitter telemetry, and public datasets. Integrates language models for automated sentiment analysis and competitor trend detection, streamlining market intelligence research during the Infosys Springboard internship.</p>
             </div>
           </div>
           
@@ -519,8 +530,8 @@
               <span>Web Scraping</span>
             </div>
             <div class="project-row-actions">
-              <span class="project-access-badge badge-private">
-                <i data-lucide="lock" class="badge-icon"></i> Private
+              <span class="project-access-badge badge-private" aria-label="Private Project">
+                <i data-lucide="lock" class="badge-icon" aria-hidden="true"></i> Private
               </span>
             </div>
           </div>
@@ -530,10 +541,10 @@
         <div class="project-row reveal-on-scroll" data-categories="ai-ml">
           <div class="project-row-main">
             <span class="project-row-index">02</span>
-            <i data-lucide="shield" class="project-row-icon"></i>
+            <i data-lucide="shield" class="project-row-icon" aria-hidden="true"></i>
             <div class="project-row-text">
               <h3 class="project-row-title">LokiVault</h3>
-              <p class="project-row-desc">AI-powered encrypted personal memory and password vault. Built as a monorepo featuring local deployment and secure data management. Integrates Gemini 2.5 Flash for conversational memory indexing and AES-256-GCM for strong encryption.</p>
+              <p class="project-row-desc">Personal vault featuring zero-knowledge AES-256-GCM encryption for complete data privacy. Utilizes Gemini 2.5 Flash for conversational, natural-language semantic search and memory indexing across user records.</p>
             </div>
           </div>
           
@@ -547,8 +558,8 @@
               <span>AES-256-GCM</span>
             </div>
             <div class="project-row-actions">
-              <span class="project-access-badge badge-private">
-                <i data-lucide="lock" class="badge-icon"></i> Private
+              <span class="project-access-badge badge-private" aria-label="Private Project">
+                <i data-lucide="lock" class="badge-icon" aria-hidden="true"></i> Private
               </span>
             </div>
           </div>
@@ -558,10 +569,10 @@
         <div class="project-row reveal-on-scroll" data-categories="ai-ml,automation">
           <div class="project-row-main">
             <span class="project-row-index">03</span>
-            <i data-lucide="globe" class="project-row-icon"></i>
+            <i data-lucide="globe" class="project-row-icon" aria-hidden="true"></i>
             <div class="project-row-text">
               <h3 class="project-row-title">AutoApply AI</h3>
-              <p class="project-row-desc">Edge browser extension that auto-fills job application forms using AI. Built to solve my own job hunt problem.</p>
+              <p class="project-row-desc">Edge browser extension that contextually parses job applications and auto-fills fields using LLM-driven document analysis. Streamlines form completion by automating customized content generation based on candidate resume data.</p>
             </div>
           </div>
           
@@ -572,12 +583,12 @@
               <span>LLM</span>
             </div>
             <div class="project-row-actions">
-              <a href="https://github.com/Loki0865/AutoApply-AI" target="_blank" rel="noopener noreferrer" class="project-access-badge badge-open">
-                <i data-lucide="github" class="badge-icon"></i> Open Source
+              <a href="https://github.com/Loki0865/AutoApply-AI" target="_blank" rel="noopener noreferrer" class="project-access-badge badge-open" aria-label="Open Source Repository on GitHub">
+                <i data-lucide="github" class="badge-icon" aria-hidden="true"></i> Open Source
               </a>
-              <a href="https://github.com/Loki0865/AutoApply-AI" target="_blank" rel="noopener noreferrer" class="btn-project-cta">
+              <a href="https://github.com/Loki0865/AutoApply-AI" target="_blank" rel="noopener noreferrer" class="btn-project-cta" aria-label="View AutoApply AI source code on GitHub">
                 <span>View Source</span>
-                <span class="arrow">→</span>
+                <span class="arrow" aria-hidden="true">→</span>
               </a>
             </div>
           </div>
@@ -587,10 +598,10 @@
         <div class="project-row reveal-on-scroll" data-categories="automation">
           <div class="project-row-main">
             <span class="project-row-index">04</span>
-            <i data-lucide="bot" class="project-row-icon"></i>
+            <i data-lucide="bot" class="project-row-icon" aria-hidden="true"></i>
             <div class="project-row-text">
               <h3 class="project-row-title">Browser AI Agent</h3>
-              <p class="project-row-desc">AI-powered browser automation agent designed to execute web tasks based on natural language instructions.</p>
+              <p class="project-row-desc">AI agent utilizing Playwright to execute complex web workflows from natural language inputs. Employs visual DOM analysis and automated selector recovery to interact with un-templated web interfaces.</p>
             </div>
           </div>
           
@@ -600,12 +611,12 @@
               <span>Playwright</span>
             </div>
             <div class="project-row-actions">
-              <a href="https://github.com/Loki0865/Browser-AI-Agent" target="_blank" rel="noopener noreferrer" class="project-access-badge badge-open">
-                <i data-lucide="github" class="badge-icon"></i> Open Source
+              <a href="https://github.com/Loki0865/Browser-AI-Agent" target="_blank" rel="noopener noreferrer" class="project-access-badge badge-open" aria-label="Open Source Repository on GitHub">
+                <i data-lucide="github" class="badge-icon" aria-hidden="true"></i> Open Source
               </a>
-              <a href="https://github.com/Loki0865/Browser-AI-Agent" target="_blank" rel="noopener noreferrer" class="btn-project-cta">
+              <a href="https://github.com/Loki0865/Browser-AI-Agent" target="_blank" rel="noopener noreferrer" class="btn-project-cta" aria-label="View Browser AI Agent source code on GitHub">
                 <span>View Source</span>
-                <span class="arrow">→</span>
+                <span class="arrow" aria-hidden="true">→</span>
               </a>
             </div>
           </div>
@@ -639,9 +650,9 @@
           <h3 class="category-title">Programming Languages</h3>
           <div class="chips-container">
             <span class="skill-chip">C++</span>
-            <span class="skill-chip">Python</span>
+            <span class="skill-chip featured">Python</span>
             <span class="skill-chip">C Language</span>
-            <span class="skill-chip">JavaScript</span>
+            <span class="skill-chip featured">JavaScript</span>
             <span class="skill-chip">MATLAB</span>
           </div>
         </div>
@@ -650,10 +661,10 @@
         <div class="skills-category-card reveal-on-scroll" style="transition-delay: 80ms;">
           <h3 class="category-title">AI & Machine Learning</h3>
           <div class="chips-container">
-            <span class="skill-chip">LLM Integration</span>
+            <span class="skill-chip featured">LLM Integration</span>
             <span class="skill-chip">GPT Integration</span>
             <span class="skill-chip">Text Data Pipelines</span>
-            <span class="skill-chip">Google Gemini APIs</span>
+            <span class="skill-chip featured">Google Gemini APIs</span>
             <span class="skill-chip">NLP Pipelines</span>
             <span class="skill-chip">Sentiment Analysis</span>
             <span class="skill-chip">LSTM Networks</span>
@@ -679,7 +690,7 @@
             <span class="skill-chip">Git / GitHub</span>
             <span class="skill-chip">Linux Terminal</span>
             <span class="skill-chip">Web Scraping</span>
-            <span class="skill-chip">Playwright</span>
+            <span class="skill-chip featured">Playwright</span>
             <span class="skill-chip">Chrome Extensions</span>
           </div>
         </div>
@@ -835,18 +846,30 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
-      <div class="footer-left">
-        <span>© 2026 Lokesh Alasandi · All systems operational.</span>
+      <div class="footer-brand">
+        <div class="footer-logo">lokesh<span>.dev</span></div>
+        <p class="footer-tagline">Designed & Built by Lokesh Alasandi</p>
+        <p class="footer-copy">© 2026 All Rights Reserved.</p>
       </div>
-      <div class="footer-right">
+      
+      <div class="footer-links-col">
+        <div class="footer-social-links">
+          <a href="https://github.com/Loki0865" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">GitHub</a>
+          <a href="https://www.linkedin.com/in/lokeshalasandi" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">LinkedIn</a>
+          <a href="mailto:lokile8499@gmail.com" aria-label="Email Address">Email</a>
+        </div>
+        <p class="footer-stack">Made with HTML, CSS, JS & AI</p>
+      </div>
+
+      <div class="footer-scroll">
         <button type="button" class="btn-scroll-top" id="btn-scroll-top" aria-label="Scroll back to top">
           <span>Back to top</span>
-          <span class="arrow-up">↑</span>
+          <span class="arrow-up" aria-hidden="true">↑</span>
         </button>
       </div>
     </div>
   </footer>
 
-  <script src="index.js?v=8" defer></script>
+  <script src="index.js?v=9" defer></script>
 </body>
 </html>

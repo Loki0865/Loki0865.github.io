@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | Lokesh Alasandi</title>
+  
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&family=Geist:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="index.css?v=8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <style>
+    .error-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--spacing-md);
+      position: relative;
+      z-index: 10;
+    }
+    .error-code {
+      font-family: var(--font-code);
+      font-size: clamp(4rem, 15vw, 9rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: var(--spacing-xxs);
+      text-shadow: 0 0 40px var(--accent-glow);
+    }
+    .error-title {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      margin-bottom: var(--spacing-xs);
+    }
+    .error-desc {
+      font-size: 1.06rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: var(--spacing-md);
+      line-height: 1.6;
+    }
+    .error-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xxs);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <div class="global-background">
+    <div class="glow-overlay"></div>
+    <div class="noise-overlay"></div>
+    <div class="bg-blob-orange"></div>
+    <div class="bg-blob-white"></div>
+  </div>
+
+  <!-- Background canvas -->
+  <canvas id="hero-network" class="hero-canvas"></canvas>
+
+  <main class="error-container">
+    <div class="error-code" aria-label="Error 404">404</div>
+    <h1 class="error-title">Connection Lost</h1>
+    <p class="error-desc">
+      The server path you are looking for does not exist or has been moved into an encrypted memory vault.
+    </p>
+    <a href="index.html" class="btn btn-primary error-btn" aria-label="Return to homepage">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Return Home</span>
+    </a>
+  </main>
+
+  <!-- Lucide & GSAP & Lenis CDNs (deferred) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.9/dist/lenis.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="index.js?v=8" defer></script>
+</body>
+</html>
