@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" class="lenis lenis-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- OG Meta Tags + SEO -->
+  <meta name="description" content="Lokesh Alasandi — Software & AI Engineer. Experienced in C++, Python, LLMs, and systems development. Graduate of Vasavi College of Engineering.">
+  <meta property="og:title" content="Lokesh Alasandi — Software & AI Engineer">
+  <meta property="og:description" content="Portfolio of Lokesh Alasandi — Software & AI Engineer. Focus on ML pipelines, automated tooling, and clean systems architecture.">
+  <meta property="og:url" content="https://lokeshalasandi.github.io">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Lokesh Alasandi — Software & AI Engineer">
+  <meta name="twitter:description" content="Software & AI Engineer · C++ & Python · ECE 9.20 CGPA · Open to work">
+  
+  <title>Lokesh Alasandi — Software & AI Engineer</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&family=Geist:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="index.css?v=4">
+  
+  <!-- Deferred CDN Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.9/dist/lenis.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+</head>
+<body>
+
+  <!-- Global Background Layer -->
+  <div class="global-background">
+    <div class="glow-overlay"></div>
+    <div class="noise-overlay"></div>
+    <div class="bg-blob-orange"></div>
+    <div class="bg-blob-white"></div>
+  </div>
+
+  <!-- Top Scroll Progress Bar -->
+  <div id="scroll-progress" class="scroll-progress"></div>
+
+  <!-- Navigation Bar (Floating glass) -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo" id="nav-logo">
+        <span class="logo-txt">lokesh</span><span class="logo-dot">.dev</span>
+      </a>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu">
+        <svg class="icon-hamburger" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="4" y1="18" x2="20" y2="18"></line>
+        </svg>
+        <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Nav Links -->
+      <div class="nav-links" id="nav-links">
+        <a href="#about" class="nav-link active" data-section="about">About</a>
+        <a href="#experience" class="nav-link" data-section="experience">Experience</a>
+        <a href="#certifications" class="nav-link" data-section="certifications">Certifications</a>
+        <a href="#projects" class="nav-link" data-section="projects">Projects</a>
+        <a href="#skills" class="nav-link" data-section="skills">Skills</a>
+        <a href="#contact" class="nav-link" data-section="contact">Contact</a>
+        <a href="resume.pdf" class="btn btn-nav-resume" download="Lokesh_Alasandi_Resume.pdf">
+          <span>Resume</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </a>
+        
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle visual mode">
+          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero" id="hero">
+    <!-- Interactive Neural Network Canvas Backdrop -->
+    <canvas id="hero-network" class="hero-canvas"></canvas>
+    
+    <div class="hero-container">
+      <div class="hero-grid">
+        
+        <!-- Left Side: Professional Headline & Copy -->
+        <div class="hero-text-col" id="hero-content">
+          <div class="status-badge-container">
+            <div class="status-badge">
+              <span class="pulse-dot"></span>
+              <span class="badge-text">Open to work · Available Immediately</span>
+            </div>
+          </div>
+          
+          <h1 class="hero-title">Lokesh Alasandi</h1>
+          
+          <!-- Static Subtitle -->
+          <div class="hero-subtitle-container">
+            <span class="hero-subtitle">Aspiring AI/ML Engineer</span>
+          </div>
+
+          <p class="hero-desc">
+            Passionate about building AI-powered applications, browser automation tools, and machine learning solutions using Python. I enjoy transforming complex ideas into fast, scalable, user-friendly software.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#projects" class="btn btn-primary">
+              <span>Explore Projects</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            <a href="#contact" class="btn btn-secondary">
+              <span>Get In Touch</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </a>
+          </div>
+
+          <div class="hero-shortcuts-hint">
+            <span class="shortcut-badge">⌘K</span>
+            <span class="shortcut-text">Press to quickly explore featured bento cards</span>
+          </div>
+        </div>
+
+        <!-- Right Side: Animated Code Editor Window Mockup -->
+        <div class="hero-visual-col">
+          <div class="ide-window">
+            <div class="ide-header">
+              <div class="ide-dots">
+                <span class="ide-dot dot-close"></span>
+                <span class="ide-dot dot-minimize"></span>
+                <span class="ide-dot dot-expand"></span>
+              </div>
+              <div class="ide-title">pipeline.py — LokiDev IDE</div>
+            </div>
+            
+            <div class="ide-tabs">
+              <div class="ide-tab active">
+                <span>pipeline.py</span>
+              </div>
+              <div class="ide-tab">
+                <span>security.cpp</span>
+              </div>
+            </div>
+
+            <div class="ide-body">
+              <div class="ide-sidebar">
+                <div class="sidebar-icon active">📁</div>
+                <div class="sidebar-icon">🔍</div>
+                <div class="sidebar-icon">⚙️</div>
+              </div>
+              
+              <div class="ide-code-area">
+                <div class="code-lines">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                  <span>6</span>
+                  <span>7</span>
+                  <span>8</span>
+                  <span>9</span>
+                  <span>10</span>
+                  <span>11</span>
+                  <span>12</span>
+                  <span>13</span>
+                  <span>14</span>
+                </div>
+                <pre class="code-content"><code><span class="code-keyword">import</span> gemini, system
+
+<span class="code-keyword">class</span> <span class="code-type">MarketIntelligenceAgent</span>:
+    <span class="code-keyword">def</span> <span class="code-func">__init__</span>(self):
+        self.llm = gemini.GenerativeModel(<span class="code-string">"gemini-1.5-pro"</span>)
+        self.active_pipelines = []
+
+    <span class="code-keyword">async def</span> <span class="code-func">ingest_market_intel</span>(self, query):
+        <span class="code-comment"># Extract real-time intelligence telemetry</span>
+        news_data = <span class="code-keyword">await</span> scrape_feeds(query)
+        sentiment = self.llm.analyze(news_data)
+        
+        <span class="code-keyword">return</span> {
+            <span class="code-string">"query"</span>: query, <span class="code-string">"sentiment"</span>: sentiment, <span class="code-string">"status"</span>: <span class="code-string">"COMPLETED"</span>
+        }</code></pre>
+              </div>
+            </div>
+            <div class="ide-footer">
+              <span>UTF-8</span>
+              <span>Python 3.10.4</span>
+              <span>Ln 8, Col 36</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="hero-scroll-indicator">
+      <span class="scroll-txt">SCROLL TO PROJECTS</span>
+      <svg class="chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </header>
+
+  <!-- Section Divider -->
+  <div class="section-divider reveal-on-scroll">
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- About Section -->
+  <section class="section about-section" id="about">
+    <div class="section-container">
+      <div class="section-header reveal-on-scroll">
+        <div class="section-index-label">01 //</div>
+        <div class="section-tag">ENGINEER PROFILE</div>
+        <h2 class="section-title">About Lokesh</h2>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-info-col reveal-on-scroll">
+          <p class="about-bio">
+            I am a software and AI engineer and an ECE graduate from <strong>Vasavi College of Engineering</strong>. My engineering background combined with hands-on software development allows me to design and implement clean, optimized, and scalable systems. My core focus is on software systems engineering, machine learning pipelines, and robust backend architectures.
+          </p>
+          <p class="about-bio">
+            Recently, as an AI/Software Engineering Intern at <strong>Infosys Springboard</strong>, I built data pipeline tools and web scraping systems designed for market intelligence using language models.
+          </p>
+        </div>
+
+        <!-- Right: Stats Panel & Certifications -->
+        <div class="about-stats-col reveal-on-scroll" style="transition-delay: 80ms;">
+          <!-- Telemetry Stats Panel -->
+          <div class="stats-panel">
+            <div class="stats-panel-header">METRICS.DAT</div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-num">9.20</div>
+                <div class="stat-label">B.E. CGPA</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num">9.81</div>
+                <div class="stat-label">Diploma CGPA</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num">4</div>
+                <div class="stat-label">Tech Projects</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num">1</div>
+                <div class="stat-label">Internship</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Section Divider -->
+  <div class="section-divider reveal-on-scroll">
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Experience & Education Section -->
+  <section class="section timeline-section" id="experience">
+    <div class="section-container">
+      <div class="section-header reveal-on-scroll">
+        <div class="section-index-label">02 //</div>
+        <div class="section-tag">TIMELINE</div>
+        <h2 class="section-title">Experience & Education</h2>
+      </div>
+
+      <div class="vertical-timeline-container">
+        <div class="vertical-timeline-line"></div>
+
+        <!-- 1. Infosys Springboard -->
+        <div class="timeline-card-wrapper left reveal-on-scroll" style="transition-delay: 0ms;">
+          <div class="timeline-dot-pulse experience-dot"></div>
+          <div class="timeline-card-content">
+            <div class="timeline-card-header">
+              <span class="timeline-date-badge">Aug – Nov 2025</span>
+              <span class="timeline-item-type type-exp">Experience</span>
+            </div>
+            <h3 class="timeline-card-title">AI/Software Engineering Intern</h3>
+            <div class="timeline-card-subtitle">Infosys Springboard</div>
+            <ul class="timeline-card-bullets">
+              <li>Built real-time intelligence system using GPT and LLaMA</li>
+              <li>NLP and sentiment analysis on news and Twitter datasets</li>
+              <li>End-to-end web scraping and AI-driven trend detection pipelines</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 2. Vasavi College of Engineering -->
+        <div class="timeline-card-wrapper right reveal-on-scroll" style="transition-delay: 80ms;">
+          <div class="timeline-dot-pulse education-dot"></div>
+          <div class="timeline-card-content">
+            <div class="timeline-card-header">
+              <span class="timeline-date-badge">2023 – 2026 (Graduated)</span>
+              <span class="timeline-item-type type-edu">Education</span>
+            </div>
+            <h3 class="timeline-card-title">B.E. Electronics & Communication Engineering</h3>
+            <div class="timeline-card-subtitle">Vasavi College of Engineering</div>
+            <ul class="timeline-card-bullets">
+              <li>9.20 CGPA · Osmania University</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3. JNGP -->
+        <div class="timeline-card-wrapper left reveal-on-scroll" style="transition-delay: 160ms;">
+          <div class="timeline-dot-pulse education-dot"></div>
+          <div class="timeline-card-content">
+            <div class="timeline-card-header">
+              <span class="timeline-date-badge">2020 – 2023 (Graduated)</span>
+              <span class="timeline-item-type type-edu">Education</span>
+            </div>
+            <h3 class="timeline-card-title">Diploma in Electronics & Communication Engineering</h3>
+            <div class="timeline-card-subtitle">JNGP</div>
+            <ul class="timeline-card-bullets">
+              <li>9.81 CGPA · SBTET</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="timeline-legend">
+        <span class="legend-item"><span class="legend-dot exp-legend"></span> Experience</span>
+        <span class="legend-item"><span class="legend-dot edu-legend"></span> Education</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Divider -->
+  <div class="section-divider reveal-on-scroll">
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Certifications Section -->
+  <section class="section certifications-section" id="certifications">
+    <div class="section-container">
+      <div class="section-header reveal-on-scroll">
+        <div class="section-index-label">03 //</div>
+        <div class="section-tag">CERTIFIED CREDENTIALS</div>
+        <h2 class="section-title">Certifications & Achievements</h2>
+      </div>
+
+      <div class="certifications-grid">
+        <!-- 1. Infosys Springboard Internship Certificate -->
+        <div class="cert-card reveal-on-scroll" style="transition-delay: 0ms;">
+          <div class="cert-card-header">
+            <span class="issuer-badge badge-infosys">Infosys</span>
+            <span class="cert-tag">Internship</span>
+          </div>
+          <div class="cert-card-body">
+            <h3 class="cert-card-name">Infosys Springboard Internship Certificate</h3>
+            <div class="cert-card-issuer">Infosys Springboard</div>
+          </div>
+          <div class="cert-card-footer">
+            <span class="cert-card-year">2025</span>
+          </div>
+        </div>
+
+        <!-- 2. Generative AI -->
+        <div class="cert-card reveal-on-scroll" style="transition-delay: 80ms;">
+          <div class="cert-card-header">
+            <span class="issuer-badge badge-google">Google Cloud</span>
+            <span class="cert-tag">AI/ML</span>
+          </div>
+          <div class="cert-card-body">
+            <h3 class="cert-card-name">Generative AI</h3>
+            <div class="cert-card-issuer">Google Cloud</div>
+          </div>
+          <div class="cert-card-footer">
+            <span class="cert-card-year">2025</span>
+          </div>
+        </div>
+
+        <!-- 3. Google AI Essentials -->
+        <div class="cert-card reveal-on-scroll" style="transition-delay: 160ms;">
+          <div class="cert-card-header">
+            <span class="issuer-badge badge-google">Google</span>
+            <span class="cert-tag">AI/ML</span>
+          </div>
+          <div class="cert-card-body">
+            <h3 class="cert-card-name">Google AI Essentials</h3>
+            <div class="cert-card-issuer">Google · Coursera</div>
+          </div>
+          <div class="cert-card-footer">
+            <span class="cert-card-year">2024</span>
+          </div>
+        </div>
+
+        <!-- 4. Introduction to Networks -->
+        <div class="cert-card reveal-on-scroll" style="transition-delay: 240ms;">
+          <div class="cert-card-header">
+            <span class="issuer-badge badge-cisco">Cisco</span>
+            <span class="cert-tag">Networking</span>
+          </div>
+          <div class="cert-card-body">
+            <h3 class="cert-card-name">Introduction to Networks</h3>
+            <div class="cert-card-issuer">Cisco</div>
+          </div>
+          <div class="cert-card-footer">
+            <span class="cert-card-year">2025</span>
+          </div>
+        </div>
+
+        <!-- 5. SQL Certification -->
+        <div class="cert-card reveal-on-scroll" style="transition-delay: 320ms;">
+          <div class="cert-card-header">
+            <span class="issuer-badge badge-ibm">IBM</span>
+            <span class="cert-tag">Database</span>
+          </div>
+          <div class="cert-card-body">
+            <h3 class="cert-card-name">SQL Certification</h3>
+            <div class="cert-card-issuer">IBM SkillsBuild</div>
+          </div>
+          <div class="cert-card-footer">
+            <span class="cert-card-year">2025</span>
+          </div>
+        </div>
+
+        <!-- 6. NCC C Certificate -->
+        <div class="cert-card reveal-on-scroll" style="transition-delay: 400ms;">
+          <div class="cert-card-header">
+            <span class="issuer-badge badge-ncc">NCC</span>
+            <span class="cert-tag">Leadership</span>
+          </div>
+          <div class="cert-card-body">
+            <h3 class="cert-card-name">NCC C Certificate</h3>
+            <div class="cert-card-issuer">National Cadet Corps</div>
+          </div>
+          <div class="cert-card-footer">
+            <span class="cert-card-year">2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Divider -->
+  <div class="section-divider reveal-on-scroll">
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Projects Section -->
+  <section class="section projects-section" id="projects">
+    <div class="section-container">
+      <div class="section-header reveal-on-scroll">
+        <div class="section-index-label">04 //</div>
+        <div class="section-tag">PRODUCT WORK</div>
+        <h2 class="section-title">Projects Showcase</h2>
+      </div>
+
+      <!-- Project Filter Tabs -->
+      <div class="projects-filter-wrapper reveal-on-scroll" style="transition-delay: 40ms;">
+        <div class="projects-filter-tabs">
+          <button type="button" class="filter-tab active" data-filter="all">All</button>
+          <button type="button" class="filter-tab" data-filter="ai-ml">AI/ML</button>
+          <button type="button" class="filter-tab" data-filter="automation">Automation</button>
+        </div>
+      </div>
+
+      <div class="projects-list">
+        
+        <!-- PROJECT 1 -->
+        <div class="project-row reveal-on-scroll" data-categories="ai-ml">
+          <div class="project-row-main">
+            <span class="project-row-index">01</span>
+            <i data-lucide="activity" class="project-row-icon"></i>
+            <div class="project-row-text">
+              <h3 class="project-row-title">Real-Time Industry Intelligence System</h3>
+              <p class="project-row-desc">Data pipeline tool that aggregates news, Twitter, and public datasets using language models to detect competitor moves and market trends in near real-time. Designed and deployed during the Infosys Springboard internship.</p>
+            </div>
+          </div>
+          
+          <div class="project-row-meta">
+            <div class="project-tags">
+              <span>Python</span>
+              <span>GPT</span>
+              <span>LLaMA</span>
+              <span>Google Gemini</span>
+              <span>Sentiment Analysis</span>
+              <span>Web Scraping</span>
+            </div>
+            <div class="project-row-actions">
+              <span class="project-access-badge badge-private">
+                <i data-lucide="lock" class="badge-icon"></i> Private
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROJECT 2 -->
+        <div class="project-row reveal-on-scroll" data-categories="ai-ml">
+          <div class="project-row-main">
+            <span class="project-row-index">02</span>
+            <i data-lucide="shield" class="project-row-icon"></i>
+            <div class="project-row-text">
+              <h3 class="project-row-title">LokiVault</h3>
+              <p class="project-row-desc">AI-powered encrypted personal memory and password vault. Built as a monorepo featuring local deployment and secure data management. Integrates Gemini 2.5 Flash for conversational memory indexing and AES-256-GCM for strong encryption.</p>
+            </div>
+          </div>
+          
+          <div class="project-row-meta">
+            <div class="project-tags">
+              <span>Node.js</span>
+              <span>TypeScript</span>
+              <span>React</span>
+              <span>PostgreSQL</span>
+              <span>Gemini 2.5 Flash</span>
+              <span>AES-256-GCM</span>
+            </div>
+            <div class="project-row-actions">
+              <span class="project-access-badge badge-private">
+                <i data-lucide="lock" class="badge-icon"></i> Private
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROJECT 3 -->
+        <div class="project-row reveal-on-scroll" data-categories="ai-ml,automation">
+          <div class="project-row-main">
+            <span class="project-row-index">03</span>
+            <i data-lucide="globe" class="project-row-icon"></i>
+            <div class="project-row-text">
+              <h3 class="project-row-title">AutoApply AI</h3>
+              <p class="project-row-desc">Edge browser extension that auto-fills job application forms using AI. Built to solve my own job hunt problem.</p>
+            </div>
+          </div>
+          
+          <div class="project-row-meta">
+            <div class="project-tags">
+              <span>JavaScript</span>
+              <span>Edge APIs</span>
+              <span>LLM</span>
+            </div>
+            <div class="project-row-actions">
+              <a href="https://github.com/Loki0865/AutoApply-AI" target="_blank" rel="noopener noreferrer" class="project-access-badge badge-open">
+                <i data-lucide="github" class="badge-icon"></i> Open Source
+              </a>
+              <a href="https://github.com/Loki0865/AutoApply-AI" target="_blank" rel="noopener noreferrer" class="btn-project-cta">
+                <span>View Source</span>
+                <span class="arrow">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROJECT 4 -->
+        <div class="project-row reveal-on-scroll" data-categories="automation">
+          <div class="project-row-main">
+            <span class="project-row-index">04</span>
+            <i data-lucide="bot" class="project-row-icon"></i>
+            <div class="project-row-text">
+              <h3 class="project-row-title">Browser AI Agent</h3>
+              <p class="project-row-desc">AI-powered browser automation agent designed to execute web tasks based on natural language instructions.</p>
+            </div>
+          </div>
+          
+          <div class="project-row-meta">
+            <div class="project-tags">
+              <span>Python</span>
+              <span>Playwright</span>
+            </div>
+            <div class="project-row-actions">
+              <a href="https://github.com/Loki0865/Browser-AI-Agent" target="_blank" rel="noopener noreferrer" class="project-access-badge badge-open">
+                <i data-lucide="github" class="badge-icon"></i> Open Source
+              </a>
+              <a href="https://github.com/Loki0865/Browser-AI-Agent" target="_blank" rel="noopener noreferrer" class="btn-project-cta">
+                <span>View Source</span>
+                <span class="arrow">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Divider -->
+  <div class="section-divider reveal-on-scroll">
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Skills Section -->
+  <section class="section skills-section" id="skills">
+    <div class="section-container">
+      <div class="section-header reveal-on-scroll">
+        <div class="section-index-label">05 //</div>
+        <div class="section-tag">SKILLS MATRIX</div>
+        <h2 class="section-title">Technical Expertise</h2>
+      </div>
+
+      <!-- Structured Categories Grid -->
+      <div class="skills-categories-grid">
+        
+        <!-- Category 1: Programming Languages -->
+        <div class="skills-category-card reveal-on-scroll">
+          <h3 class="category-title">Programming Languages</h3>
+          <div class="chips-container">
+            <span class="skill-chip">C++</span>
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">C Language</span>
+            <span class="skill-chip">JavaScript</span>
+            <span class="skill-chip">MATLAB</span>
+          </div>
+        </div>
+
+        <!-- Category 2: AI & Machine Learning -->
+        <div class="skills-category-card reveal-on-scroll" style="transition-delay: 80ms;">
+          <h3 class="category-title">AI & Machine Learning</h3>
+          <div class="chips-container">
+            <span class="skill-chip">LLM Integration</span>
+            <span class="skill-chip">GPT Integration</span>
+            <span class="skill-chip">Text Data Pipelines</span>
+            <span class="skill-chip">Google Gemini APIs</span>
+            <span class="skill-chip">NLP Pipelines</span>
+            <span class="skill-chip">Sentiment Analysis</span>
+            <span class="skill-chip">LSTM Networks</span>
+            <span class="skill-chip">ARIMA Forecasting</span>
+          </div>
+        </div>
+
+        <!-- Category 3: Databases & Cloud -->
+        <div class="skills-category-card reveal-on-scroll" style="transition-delay: 160ms;">
+          <h3 class="category-title">Databases & Cloud</h3>
+          <div class="chips-container">
+            <span class="skill-chip">SQL</span>
+            <span class="skill-chip">Data Sanitization</span>
+            <span class="skill-chip">AES Encryption</span>
+            <span class="skill-chip">Replit Hosting</span>
+          </div>
+        </div>
+
+        <!-- Category 4: Tools & Version Control -->
+        <div class="skills-category-card reveal-on-scroll" style="transition-delay: 240ms;">
+          <h3 class="category-title">Tools & Version Control</h3>
+          <div class="chips-container">
+            <span class="skill-chip">Git / GitHub</span>
+            <span class="skill-chip">Linux Terminal</span>
+            <span class="skill-chip">Web Scraping</span>
+            <span class="skill-chip">Playwright</span>
+            <span class="skill-chip">Chrome Extensions</span>
+          </div>
+        </div>
+
+        <!-- Category 5: Embedded Systems -->
+        <div class="skills-category-card reveal-on-scroll" style="transition-delay: 320ms;">
+          <h3 class="category-title">Embedded Systems</h3>
+          <div class="chips-container">
+            <span class="skill-chip">Microcontrollers</span>
+            <span class="skill-chip">Hardware Debugging</span>
+            <span class="skill-chip">Signal Processing</span>
+            <span class="skill-chip">Circuit Design</span>
+            <span class="skill-chip">ECE Core Concepts</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Divider -->
+  <div class="section-divider reveal-on-scroll">
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Contact Section -->
+  <section class="section contact-section" id="contact">
+    <div class="section-container">
+      <div class="section-header reveal-on-scroll">
+        <div class="section-index-label">06 //</div>
+        <div class="section-tag">SECURE COMMS</div>
+        <h2 class="section-title">Get In Touch</h2>
+      </div>
+
+      <div class="contact-editorial-grid reveal-on-scroll">
+        <!-- Ambient decorative glow backdrop -->
+        <div class="contact-bg-glow"></div>
+        
+        <!-- Left Side: Editorial Pitch & Primary Actions -->
+        <div class="contact-content-side">
+          <div class="contact-status-light">
+            <span class="status-pulse-dot"></span>
+            <span class="status-lbl">Available for Opportunities</span>
+          </div>
+          
+          <h3 class="contact-editorial-title">Let's build something meaningful.</h3>
+          
+          <p class="contact-editorial-pitch">
+            I'm currently open to Software Engineering, AI/ML, and Python/LLM opportunities. If you're building something exciting or looking for a passionate engineer, let's connect and create something meaningful together.
+          </p>
+
+          <div class="contact-primary-actions">
+            <button type="button" class="btn btn-primary contact-cta-btn" id="email-copy-btn" data-email="lokile8499@gmail.com" aria-label="Copy direct email address">
+              <i data-lucide="copy" class="btn-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                </svg>
+              </i>
+              <span class="btn-text">Copy Email Address</span>
+            </button>
+            <a href="mailto:lokile8499@gmail.com" class="btn btn-secondary contact-secondary-btn" aria-label="Open default mail client">
+              <i data-lucide="external-link" class="btn-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h6v6"></path>
+                  <path d="M10 14 21 3"></path>
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                </svg>
+              </i>
+              <span>Send Email</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Side: Premium Interactive Cards Deck -->
+        <div class="contact-cards-side">
+          
+          <!-- Card 1: Email -->
+          <a href="mailto:lokile8499@gmail.com" class="contact-interactive-card" aria-label="Direct Email Link">
+            <div class="card-glow-reflection"></div>
+            <div class="card-icon-container">
+              <i data-lucide="mail" class="contact-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                </svg>
+              </i>
+            </div>
+            <div class="card-details">
+              <h4 class="card-title">Direct Email</h4>
+              <p class="card-description">Reach out directly for opportunities or general inquiries.</p>
+              <span class="card-action-link">
+                <span class="link-val">lokile8499@gmail.com</span>
+                <i data-lucide="arrow-up-right" class="action-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 7h10v10"></path>
+                    <path d="M7 17 17 7"></path>
+                  </svg>
+                </i>
+              </span>
+            </div>
+          </a>
+
+          <!-- Card 2: GitHub -->
+          <a href="https://github.com/Loki0865" target="_blank" rel="noopener noreferrer" class="contact-interactive-card" aria-label="GitHub Profile">
+            <div class="card-glow-reflection"></div>
+            <div class="card-icon-container">
+              <i data-lucide="github" class="contact-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                  <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                </svg>
+              </i>
+            </div>
+            <div class="card-details">
+              <h4 class="card-title">Open Source</h4>
+              <p class="card-description">Explore my automated scripts, pipelines, and public repositories.</p>
+              <span class="card-action-link">
+                <span class="link-val">github.com/Loki0865</span>
+                <i data-lucide="arrow-up-right" class="action-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 7h10v10"></path>
+                    <path d="M7 17 17 7"></path>
+                  </svg>
+                </i>
+              </span>
+            </div>
+          </a>
+
+          <!-- Card 3: LinkedIn -->
+          <a href="https://www.linkedin.com/in/lokeshalasandi" target="_blank" rel="noopener noreferrer" class="contact-interactive-card" aria-label="LinkedIn Profile">
+            <div class="card-glow-reflection"></div>
+            <div class="card-icon-container">
+              <i data-lucide="linkedin" class="contact-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect width="4" height="12" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </i>
+            </div>
+            <div class="card-details">
+              <h4 class="card-title">LinkedIn Connection</h4>
+              <p class="card-description">Connect for professional updates, collaborations, and updates.</p>
+              <span class="card-action-link">
+                <span class="link-val">linkedin.com/in/lokeshalasandi</span>
+                <i data-lucide="arrow-up-right" class="action-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 7h10v10"></path>
+                    <path d="M7 17 17 7"></path>
+                  </svg>
+                </i>
+              </span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <span>© 2026 Lokesh Alasandi · All systems operational.</span>
+      </div>
+      <div class="footer-right">
+        <button type="button" class="btn-scroll-top" id="btn-scroll-top" aria-label="Scroll back to top">
+          <span>Back to top</span>
+          <span class="arrow-up">↑</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="index.js?v=4" defer></script>
+</body>
+</html>
